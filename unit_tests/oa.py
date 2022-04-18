@@ -9,8 +9,11 @@ def launcher(request):
     session_id = "asession"
     session_manager = oj.get_session_manager(session_id)
 
+    def on_click(dbref, msg):
+        pass
     with oj.sessionctx(session_manager):
-        hinav_ = HierarchyNavigator_("hinav", myhierarchy)
+        hinav_ = HierarchyNavigator_(
+            "hinav", myhierarchy).event_handle(oj.click, on_click)
     wp = jp.WebPage()
     wp.tailwind = False
     wp.head_html = """<script src="https://cdn.tailwindcss.com/"></script>"""

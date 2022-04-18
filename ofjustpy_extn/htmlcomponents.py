@@ -44,6 +44,8 @@ def HierarchyNavigator_(key, hierarchy,  max_depth=4, max_childs=20, pcp=[], **k
     # ============================ end ===========================
     # ========================= update nav ui ========================
 
+    def dummy_event_handler(dbref, message):
+        pass
     # ============================== end =============================
 
     def postrender(dbref, label=labels, arrows=arrows, steps=steps, childslots=childslots
@@ -60,6 +62,7 @@ def HierarchyNavigator_(key, hierarchy,  max_depth=4, max_childs=20, pcp=[], **k
         dbref.hierarchy = hierarchy
         dbref.childslots = childslots
 
+        print("event handles ", dbref.stub.eventhandlers)
         for arrow in arrows:
             arrow.target.hinav = dbref
         for cs in childslots:
@@ -93,10 +96,14 @@ def HierarchyNavigator_(key, hierarchy,  max_depth=4, max_childs=20, pcp=[], **k
 
         def fold(fold_idx, hinav=dbref):
             # path=self.show_path.split("/")
-            for i in range(hinav.show_depth, fold_idx, +1):
+            for i in range(hinav.show_depth, fold_idx, -1):
                 arrstub = dbref.steps[i]
                 arrstub.target.set_class('hidden')
                 hinav.show_path.pop()
+            hinav.show_depth = fold_idx
+            print("post fold ", hinav.show_depth)
+            dbref.update_child_panel()
+
         dbref.fold = fold
 
         def update_child_panel(hinav=dbref):
