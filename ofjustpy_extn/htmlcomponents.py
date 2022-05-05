@@ -8,7 +8,7 @@ from dpath.util import get as dget
 
 
 @trackStub
-def HierarchyNavigator_(key, hierarchy,  max_depth=4, max_childs=20, pcp=[], **kwargs):
+def HierarchyNavigator_(key, hierarchy,  max_depth=6, max_childs=20, pcp=[], **kwargs):
 
     # ======================== the child panel =======================
     def on_childbtn_click(dbref, msg):
@@ -26,7 +26,7 @@ def HierarchyNavigator_(key, hierarchy,  max_depth=4, max_childs=20, pcp=[], **k
 
     # ============================== end =============================
 
-    # =========================== the arrow ==========================
+    # =========================== the arrows ==========================
     def on_arrow_click(dbref, msg):
         print("arrow clicked: folding till level ",  dbref.value)
         dbref.hinav.arrow_pos = dbref.value
@@ -63,6 +63,9 @@ def HierarchyNavigator_(key, hierarchy,  max_depth=4, max_childs=20, pcp=[], **k
         dbref.childslots = childslots
 
         print("event handles ", dbref.stub.eventhandlers)
+        if 'click' not in dbref.stub.eventhandlers :
+            raise ValueError("HierarchyNavigator requires click event handler for required for proper working")
+        
         for arrow in arrows:
             arrow.target.hinav = dbref
         for cs in childslots:
@@ -74,7 +77,6 @@ def HierarchyNavigator_(key, hierarchy,  max_depth=4, max_childs=20, pcp=[], **k
                         "/".join([*hinav.show_path, selected_child_label]))
             print(
                 f"""{"/" +"/".join([*hinav.show_path, selected_child_label])}""")
-            print(dval)
             if isinstance(dval, dict):
                 hinav.unfold(selected_child_label)
             else:
@@ -86,10 +88,12 @@ def HierarchyNavigator_(key, hierarchy,  max_depth=4, max_childs=20, pcp=[], **k
             # the unseen arrow
             hinav.show_depth += 1
             fua = hinav.steps[hinav.show_depth]
+            print("fua = ", fua.target.classes)
             fua.target.remove_class('hidden')
+            print("fua = ", fua.target.classes)
             hinav.labels[hinav.show_depth].target.text = child_label
-
             hinav.show_path.append(child_label)
+            print("unfolded: new depth ", hinav.show_depth, " new path :", hinav.show_path )
             hinav.update_child_panel()
             pass
         dbref.unfold = unfold
@@ -111,7 +115,7 @@ def HierarchyNavigator_(key, hierarchy,  max_depth=4, max_childs=20, pcp=[], **k
                 cs.target.set_class('hidden')
                 cs.target.text = ""
             showitem = dget(hinav.hierarchy, "/" + "/".join(hinav.show_path))
-            print("showitem = ", showitem)
+            print("update_child_panel: childpanel refreshed: new child labels = ", showitem.keys())
             for cbtnstub, clabel in zip(childslots, showitem.keys()):
                 cbtnstub.target.remove_class('hidden')
                 cbtnstub.target.text = clabel
