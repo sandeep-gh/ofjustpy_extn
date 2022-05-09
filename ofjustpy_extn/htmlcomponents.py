@@ -8,7 +8,7 @@ from dpath.util import get as dget
 
 
 @trackStub
-def HierarchyNavigator_(key, hierarchy,  max_depth=6, max_childs=20, pcp=[], **kwargs):
+def HierarchyNavigator_(key, hierarchy,  callback_terminal_selected, max_depth=6, max_childs=20, pcp=[], **kwargs):
 
     # ======================== the child panel =======================
     def on_childbtn_click(dbref, msg):
@@ -80,7 +80,9 @@ def HierarchyNavigator_(key, hierarchy,  max_depth=6, max_childs=20, pcp=[], **k
             if isinstance(dval, dict):
                 hinav.unfold(selected_child_label)
             else:
+                terminal_path = f"""{"/" +"/".join([*hinav.show_path, selected_child_label])}"""
                 print("Hierarchy component: at terminal point")
+                callback_terminal_selected(terminal_path)
 
         dbref.update_ui_child_select = update_ui_child_select
 
