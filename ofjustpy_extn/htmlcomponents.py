@@ -1,4 +1,4 @@
-from ofjustpy.htmlcomponents import HCC, Stub, Button_, Span_, StackH_, StackV_
+from ofjustpy.htmlcomponents import HCC, Stub, Button_, Span_, StackH_, StackV_, Input_, Td_, Tr_, Table_ as ojTable_
 from ofjustpy.icons import chevronright_icon
 from ofjustpy.ui_styles import basesty, sty
 from ofjustpy.tracker import trackStub
@@ -138,3 +138,17 @@ def HierarchyNavigator_(key, hierarchy,  callback_terminal_selected, max_depth=6
                 *pcp, *sty.stackh], postrender=postrender, redirects=[('click', on_click_hook)], **kwargs)
     stub.childpanel_ = childpanel_
     return stub
+
+
+def Table_(key, values, add_cbox=False):
+    def rows_():
+        for i, row in enumerate(values):
+            def cgens():
+                if add_cbox:
+                    yield Input_(f"cbox_{i}", type='checkbox', pcp=sty.checkbox, value=str(i))
+                for j, item in enumerate(row):
+                    yield Td_(f"cell{i}{j}", text=item)
+            yield Tr_(f"row_{i}", cgens(), isodd=i%2==1)
+    return ojTable_(key, rows_())
+
+
