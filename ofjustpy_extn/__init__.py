@@ -1,1 +1,1 @@
-from .htmlcomponents import HierarchyNavigator_, Table_
+from .htmlcomponents import HierarchyNavigator_, Table_, EnumSelector_

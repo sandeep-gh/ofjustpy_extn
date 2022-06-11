@@ -1,4 +1,5 @@
-from ofjustpy.htmlcomponents import HCC, Stub, Button_, Span_, StackH_, StackV_, Input_, Td_, Tr_, Table_ as ojTable_
+from ofjustpy.htmlcomponents import HCC, Stub, Button_, Span_, StackH_, StackV_, Input_, Td_, Tr_, Table_ as ojTable_, Option_, Select_, WithBanner_
+import ofjustpy as oj
 from ofjustpy.icons import chevronright_icon
 from ofjustpy.ui_styles import basesty, sty
 from ofjustpy.tracker import trackStub
@@ -152,3 +153,17 @@ def Table_(key, values, add_cbox=False):
     return ojTable_(key, rows_())
 
 
+
+@trackStub
+def EnumSelector_(key, enumtype, label=None, on_select=None):
+    if not label:
+        label = enumtype.__name__
+    enumselect_ = Select_(
+        "selector",
+        [Option_(str(_.value), text=str(_.value), value=str(_.value)) for _ in enumtype],
+        value=str(next(iter(enumtype))).value)
+    if on_select:
+        enumselect_.event_handle(oj.change, on_select)
+    return WithBanner_(key, label, enumselect_)
+    
+    
