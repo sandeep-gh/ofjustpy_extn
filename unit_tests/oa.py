@@ -5,6 +5,10 @@ import ofjustpy as oj
 import ofjustpy_styeditor as ojs
 from tailwind_tags import *
 myhierarchy = {'h1': {'h2': {'h3': {'h4': 1}}}}
+def terminal_node_callback(spath):
+    print ('terminal node selected', spath)
+    pass
+
 
 def walker(de, kpath="/"):
     yield f"{kpath}{de.stub.key}", de
@@ -20,7 +24,7 @@ def launcher(request):
         pass
     with oj.sessionctx(session_manager):
         hinav_ = HierarchyNavigator_(
-            "hinav", myhierarchy).event_handle(oj.click, on_click)
+            "hinav", myhierarchy, terminal_node_callback).event_handle(oj.click, on_click)
 
         wp = oj.WebPage_("wp", body_styl=[
             bg/pink/"100/10"], cgens=[])()       
@@ -39,7 +43,7 @@ def launcher(request):
     hinav_(wp)
     with oj.sessionctx(session_manager):
         hinav2_ = HierarchyNavigator_(
-            "hinav2", component_hierarchy).event_handle(oj.click, on_click)
+            "hinav2", component_hierarchy, terminal_node_callback).event_handle(oj.click, on_click)
     hinav2_.childpanel_(wp)
     hinav2_(wp)
         
@@ -48,9 +52,9 @@ def launcher(request):
     return wp
 
 
-# request = Dict()
-# request.session_id = "session_id"
-# wp = launcher(request)
+request = Dict()
+request.session_id = "session_id"
+wp = launcher(request)
 # stubStore = wp.session_manager.stubStore
 # hinav_  = stubStore.hinav
 # childpanel_ = hinav_.childpanel_
