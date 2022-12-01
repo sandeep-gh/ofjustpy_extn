@@ -39,7 +39,20 @@ from tailwind_tags import (mr,
                            full,
                            hidden,
                            pink,
-                           conc_twtags
+                           conc_twtags,
+                           tstr,
+                           bsw,
+                           cyan,
+                           sw,
+                           variant,
+                           gray,
+                           fc,
+                           slate,
+                           bd,
+                           H,
+                           top,
+                           right,
+                           absolute
                            )
 from ofjustpy import click
 from dpath.util import get as dget
@@ -190,7 +203,7 @@ def Table_(key, values, add_cbox=False):
 
 
 
-def EnumSelector_(key, enumtype, label=None):
+def EnumSelector_(key, enumtype):
     enumselect_ = Select_(
         key,
         [Option_(str(_.value), text=str(_.value), value=str(_.value)) for _ in enumtype],
@@ -216,13 +229,14 @@ def TwoColumnStackV_(key: AnyStr, cgens: List, pcp: List = [], **kwargs):
               StackV_("rightbox", cgens=cgen_parts[1], pcp=[W/"5/12", space/y/2])
               ]
     def postrender(dbref):
-        boxes[0](dbref)
-        boxes[1](dbref)
-
+        # boxes[0](dbref)
+        # boxes[1](dbref)
+        pass
     stub = Stub(key,
                 jp.Div,
                 twsty_tags=[db.f, jc.center, space/x/4, *pcp],
                 postrender=postrender,
+                cgens = boxes,
                 **kwargs)
     return stub
 
@@ -274,34 +288,43 @@ def chunks(iterable, size):
     #     print ("need to undock ", target_spath)
     #     pass
 
-    
+
+# ============================== dockbar =============================
+undock_btn_sty = [bsw.xl,
+                      bg/cyan/5,
+                      sw/cyan/"500/50",
+                      *variant(bg/gray/4,
+                                 fc/slate/5,
+                                 bd/slate/2,
+                                 bsw.none,
+                                 rv="disabled")
+                                            
+                      ]
+
+dock_btn_gen = lambda key: Button_(f"dock_{key}", text="-", pcp=[bg/pink/1, W/6, H/6, top/1, right/1, absolute])
+
+
 
 @trackStub
-def Dockbar_(key,  pcp:List = [], **kwargs):
+def Dockbar_(key,  cgens = [], pcp:List = [], **kwargs):
 
 
     def postrender(dockbar_dbref):
-        print ("postrender called")
         dockbar_dbref.addItems(dockbar_dbref.stub.undock_btns)
         pass
 
     def on_undock_click(undock_btn, msg):
 
         # make sure we make the undock button disappear
-        print ("undock button clicked = ", undock_btn.stub.key)
         #undock_btn_.target.add_twsty_tags(hidden)
         #find the hero
-        if  "hidden" not in undock_btn.stub.thehero_.target.classes:
-            print ("hidden not found in ", undock_btn.stub.thehero_.key)
-            
         undock_btn.stub.thehero_.target.remove_twsty_tags(hidden)
-        undock_btn.add_twsty_tags(hidden)
+        #undock_btn.add_twsty_tags(hidden)
+        undock_btn.disabled = True
         pass
 
     def on_dock_click(dock_btn, msg):
-        print ("dock clicked")
         dockbar_ = dock_btn.stub.dockbar_
-        print  ("dockbar_ = ", dockbar_)
         # minimize button clicked ; make target disapper
         
         # curr_hero_: for lack of better word; is the actual html component/frame/window/ that
@@ -311,10 +334,11 @@ def Dockbar_(key,  pcp:List = [], **kwargs):
         curr_hero_.target.add_twsty_tags(hidden)
         assert  "hidden" in curr_hero_.target.classes
 
-        
+        print("on dock clicked ")
         # unhide the undock button in the dockbar
-        undock_btn_.target.remove_twsty_tags(hidden)
-        assert undock_btn_.thehero_ == curr_hero_
+        # undock_btn_.target.remove_twsty_tags(hidden)
+        # assert undock_btn_.thehero_ == curr_hero_
+        undock_btn_.target.disabled = False
         
         pass
     
@@ -328,11 +352,12 @@ def Dockbar_(key,  pcp:List = [], **kwargs):
             
         def dockify(self, dbref_):
             key = dbref_.key
-            
+            dock_label = dbref_.kwargs.get("dock_label", key)
             undock_btn_ = oj.Button_(f"undockbtn_{key}",
-                              text=key, value=dbref_.spath,
-                                     pcp = [*self.undock_btn_sty, hidden]).event_handle(oj.click,
+                                     text=dock_label, disabled=True, 
+                                     pcp = [*self.undock_btn_sty]).event_handle(oj.click,
                                                                         on_undock_click)
+
 
             undock_btn_.thehero_ = dbref_
             self.undock_btns.append(undock_btn_)
@@ -352,10 +377,11 @@ def Dockbar_(key,  pcp:List = [], **kwargs):
                        jp.Div,
                        postrender=postrender,
                        twsty_tags = conc_twtags(*sty.dockbar, *pcp),
+                       cgens = cgens,
                        **kwargs
                 )
 
-
+# ============================ end dockbar ===========================
 
 # def Dockbar_(key: AnyStr):
 # #     return oj.Div_(key, text="Make me a dockbar")
@@ -400,13 +426,14 @@ def Paginate_(key: AnyStr, cgens: List, num_pages=10, chunk_size=100, container_
                        ]
         
     def postrender(dbref):
-        print ("deck has been initialized")
+        #print ("deck has been initialized")
+        pass
         
     page_deck_ = oj.StackD_(f"{key}_deck", cgens=page_containers, postrender=postrender, pcp=[])
 
 
     def on_page_id_select(page_selector, msg):
-        print ("page selected = ", msg.value)
+        #print ("page selected = ", msg.value)
         #page_selector.paginate.curr_page = msg.value
         #TODO: do we need to check msg.value
         selected_page = page_containers[int(msg.value)]
@@ -421,3 +448,11 @@ def Paginate_(key: AnyStr, cgens: List, num_pages=10, chunk_size=100, container_
     return StackV_(key, cgens=[page_selector_, page_deck_], pcp = pcp)
 
                        
+
+class VForm(jp.Form):
+    def validate():
+        """
+        validate all the inputs in the form
+        """
+        print ("validate called")
+    pass

@@ -16,7 +16,16 @@ all_colors = [slate , gray , zinc , neutral , stone , red , orange , amber , yel
 app = jp.build_app()
 def launcher(request):
     session_manager = oj.get_session_manager(request.session_id)
-    undock_btn_sty = [bsw.xl, bg/cyan/5, sw/cyan/"500/50"]
+    undock_btn_sty = [bsw.xl,
+                      bg/cyan/5,
+                      sw/cyan/"500/50",
+                      *variant(bg/gray/4,
+                                 fc/slate/5,
+                                 bd/slate/2,
+                                 bsw.none,
+                                 rv="disabled")
+                                            
+                      ]
     dock_btn_gen = lambda key: oj.Button_(f"dock_{key}", text="-", pcp=[bg/pink/1])
     with oj.sessionctx(session_manager):
         with session_manager.uictx("tlctx") as tlctx:
@@ -29,6 +38,7 @@ def launcher(request):
                      text="aspan",
                      )
             dock_btn1_  = dockbar_.dockify(span1_)
+            
 
             span2_  = oj.Span_("targetSpan2",
                      text="aspan",
@@ -51,27 +61,27 @@ def launcher(request):
 app.add_jproute("/", launcher)
 
 # ============================== testing =============================
-request = Dict()
-request.session_id = "abc"
+# request = Dict()
+# request.session_id = "abc"
 
-wp = launcher(request)
-_sm = wp.session_manager
-_ss = _sm.stubStore
-msg = Dict()
-msg.value = "h"
-msg.page = wp
-print(_ss.tlctx.keys())
-with oj.sessionctx(_sm):
-    # dock target1
-    _ss.tlctx.dock_targetSpan1.target.on_click(msg)
-    # dock target 2
-    _ss.tlctx.dock_targetSpan2.target.on_click(msg)
+# wp = launcher(request)
+# _sm = wp.session_manager
+# _ss = _sm.stubStore
+# msg = Dict()
+# msg.value = "h"
+# msg.page = wp
+# print(_ss.tlctx.keys())
+# with oj.sessionctx(_sm):
+#     # dock target1
+#     _ss.tlctx.dock_targetSpan1.target.on_click(msg)
+#     # dock target 2
+#     _ss.tlctx.dock_targetSpan2.target.on_click(msg)
 
-    # undock target 1
-    _ss.tlctx.undockbtn_targetSpan1.target.on_click(msg)
+#     # undock target 1
+#     _ss.tlctx.undockbtn_targetSpan1.target.on_click(msg)
 
-        # undock target 1
-    _ss.tlctx.undockbtn_targetSpan2.target.on_click(msg)
+#         # undock target 1
+#     _ss.tlctx.undockbtn_targetSpan2.target.on_click(msg)
     
 
 # ================================ end ===============================
